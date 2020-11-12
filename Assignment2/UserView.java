@@ -66,11 +66,9 @@ public class UserView extends JDialog {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String id = txtUserId.getText();
+				
 				if (id.equals(user.getId())) {
 					JOptionPane.showMessageDialog(null, "CANNOT FOLLOW YOURSELF");
-				}
-				else if (user.getCurrentlyFollowing().contains(id)) {
-					JOptionPane.showMessageDialog(null, "You are already following " + id);
 				}
 				else {
 					User userToFollow = system.findUser(id);
@@ -78,8 +76,11 @@ public class UserView extends JDialog {
 					if(userToFollow == null) {
 						JOptionPane.showMessageDialog(null, "USER \"" + id + "\" DOES NOT EXIST");
 					}
+					else if (user.getCurrentlyFollowing().contains(userToFollow)){
+						JOptionPane.showMessageDialog(null, "You are already following " + id);
+					}
 					else {
-						user.follow(id);
+						user.follow(userToFollow);
 						listFollowing.setModel(setFollowListModel(user)); 
 					}
 				}
@@ -176,8 +177,8 @@ public class UserView extends JDialog {
 	private DefaultListModel setFollowListModel(User user) {
 		DefaultListModel model = new DefaultListModel();
 		
-		for (String id : user.getCurrentlyFollowing()) {
-			model.addElement(id);
+		for (User id : user.getCurrentlyFollowing()) {
+			model.addElement(id.getId());
 		}
 		
 		return model;

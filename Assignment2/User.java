@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 // user has messages
 // has who they follow
-public class User implements SystemEntry {
+public class User extends Subject implements SystemEntry, Observer {
 	private String userID;
-	private ArrayList<String> currentlyFollowing;
+	private ArrayList<User> currentlyFollowing;
 	private ArrayList<String> messages;
 	
 	public User(String userID) {
 		this.userID = userID;
-		this.currentlyFollowing = new ArrayList<String>();
+		this.currentlyFollowing = new ArrayList<User>();
 		this.messages = new ArrayList<String>();
 	}
 
@@ -25,21 +25,32 @@ public class User implements SystemEntry {
 	}
 
 
-	public ArrayList<String> getCurrentlyFollowing() {
+	public ArrayList<User> getCurrentlyFollowing() {
 		return currentlyFollowing;
 	}
 
 
-	public void follow(String userId) {
-		this.currentlyFollowing.add(userId);
+	public void follow(User user) {
+		this.currentlyFollowing.add(user);
+		attach(user);
 	}
 	
 	public void postMessage(String message) {
 		this.messages.add(message);
+		notifyObservers();
 	}
 	
 	@Override
 	public double accept(SysEntryVisitor visitor) {
 		return visitor.visit(this);
+	}
+
+	@Override
+	public void update(Subject updatedUser) {
+		// TODO Auto-generated method stub
+		// update textarea
+		int index = ((User)updatedUser).getMessages().size() - 1;
+		((User)updatedUser).getMessages().get(index);
+		
 	}
 }
