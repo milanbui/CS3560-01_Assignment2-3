@@ -25,15 +25,31 @@ public class PositiveSysEntryVisitor implements SysEntryVisitor{
 
 	@Override
 	public double visit(Group group) {
-		return 0;
+		double count = 0;
+		for(SystemEntry element : group.getGroupsAndUsers()) {
+			if ( element instanceof User) {
+				count = count + visit((User)element);
+			}
+			else {
+				count = count + visit((Group)element);
+			}
+		}
+		
+		return count;
 	}
 
 	@Override
 	public double visit(User user) {
-		return 0;
+		double count = 0;
+		for (String message : user.getMessages()) {
+			for(String word : positiveWords) {
+				if (message.contains(word)) {
+					count = count + 1;
+				}
+			}
+		}
 		
-		
+		return count;
 	}
-	
 
 }

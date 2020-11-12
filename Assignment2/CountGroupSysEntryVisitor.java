@@ -4,13 +4,21 @@ public class CountGroupSysEntryVisitor implements SysEntryVisitor {
 
 	@Override
 	public double visit(Group group) {
-		int count = 0;
+		double count;
+		if(group.getId().equals("Root")) {
+			count = 0;
+		}
+		else {
+			count = 1;
+		}
 		
 		for(SystemEntry element : group.getGroupsAndUsers()) {
 			
 			if(element instanceof Group) {
-				count++;
-				return count + visit((Group)element);
+				count = count + visit((Group)element);
+			}
+			else {
+				count = count + visit((User)element);
 			}
 		}
 		

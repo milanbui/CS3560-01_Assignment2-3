@@ -4,16 +4,23 @@ public class CountMsgSysEntryVisitor implements SysEntryVisitor {
 
 	@Override
 	public double visit(Group group) {
-		return 0;
-		// TODO Auto-generated method stub
+		double count = 0;
 		
+		for(SystemEntry element : group.getGroupsAndUsers()) {
+			if(element instanceof User) {
+				count = count + visit((User)element);
+			}
+			else {
+				count = count + visit((Group)element);
+			}
+		}
+		return count;		
 	}
 
 	@Override
 	public double visit(User user) {
-		return 0;
-		// TODO Auto-generated method stub
-		
+		int count = user.getMessages().size();
+		return (double)count;
 	}
 
 }

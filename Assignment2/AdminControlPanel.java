@@ -274,10 +274,24 @@ public class AdminControlPanel extends JFrame {
 		JButton btnShowPositivePercentage = new JButton("Show Positive Percentage");
 		btnShowPositivePercentage.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {			
-				PositiveSysEntryVisitor positiveCalc = new PositiveSysEntryVisitor();
-				double positivePerc = groupsAndUsers.accept(positiveCalc);
-				String message = String.valueOf(positivePerc) + "% POSITIVE";
+			public void mouseClicked(MouseEvent e) {	
+				
+				String message;
+				CountMsgSysEntryVisitor totalMsg = new CountMsgSysEntryVisitor();
+				double total = groupsAndUsers.accept(totalMsg);
+				
+				if(total != 0) {
+					PositiveSysEntryVisitor positiveCalc = new PositiveSysEntryVisitor();
+					double positive = groupsAndUsers.accept(positiveCalc);
+					
+					double positivePerc = (100 * (positive / total));
+		
+					message = String.format("%.2f", positivePerc) + "% POSITIVE";
+				}
+				else {
+					message = "0% POSITIVE";
+				}
+				
 				textPane.setText(message);
 			}
 		});

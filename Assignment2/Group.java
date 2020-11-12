@@ -40,63 +40,61 @@ public class Group implements SystemEntry {
 	}
 	
 	public boolean isExistingID(String id){
+		boolean isExisting = false;
 		
 		if(this.groupId.equals(id)){
-			return true;
+			isExisting = true;
 		}
 		
 		for (SystemEntry element : children) {
 
 			if (element.getId().equals(id)) {
-				return true;
+				isExisting = true;
 			}
 			
 			if (element instanceof Group){
-				return ((Group) element).isExistingID(id);
-
+				isExisting = isExisting || ((Group) element).isExistingID(id);
 			}	
 		}
-		
-		return false;
+		return isExisting;
 	}
 	
+	
 	public Group findGroup(String id) {
-
+		Group group = null;
 		if (id.equals(groupId)) {
 			return this;
 		}
 		else {
-		
 			for(SystemEntry element : children) {
 				
-	
 				if(element instanceof Group) {
-
-					if(element.getId().equals(id)) {
-						return (Group)element;
+					if(((Group)element).findGroup(id) != null){
+						group = ((Group)element).findGroup(id);
 					}
-					
-					return ((Group)element).findGroup(id);
 				}	
 			}
 		}
-
-		return null;
+		
+		return group;
 	}
 
 	public User findUser(String id) {
-
+		User user = null;
+		
 		for(SystemEntry element : children) {
 			
 			if(element instanceof Group) {				
-				return ((Group)element).findUser(id);
+				if(((Group)element).findUser(id) != null){
+					user = ((Group)element).findUser(id);
+				}
 			}	
 			else if (element.getId().equals(id)) {
 				return (User)element;
 			}
 		}
 		
-		return null;
+		return user;
 	}
 
 }
