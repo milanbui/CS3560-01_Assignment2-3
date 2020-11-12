@@ -1,3 +1,10 @@
+/****************************************************************************************
+ * Name  : Milan Bui
+ * Date  : 12 November 2020
+ * Class : CS3650.01
+ * 
+ * Assignment 2
+ ****************************************************************************************/
 package cpp.cs3560.assignment2;
 
 
@@ -14,21 +21,21 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 public class AdminControlPanel extends JFrame {
 
-	private static AdminControlPanel frame;
+	private static AdminControlPanel frame; // static for singleton pattern
 	private JPanel contentPane;
 	private JTextField txtUserId;
 	private JTextField txtGroupId;
 	
-	private Group groupsAndUsers;
+	private Group system;
 	
 	
 	/**
-	 * Constructor: Create the frame.
+	 * PRIVATE Constructor: Create the frame. [Singleton]
 	 */
 	private AdminControlPanel() {
 		setTitle("Control Panel");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 760, 580);
+		setBounds(100, 100, 518, 383);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -38,11 +45,12 @@ public class AdminControlPanel extends JFrame {
 		/*
 		 * TREE DISPLAY OF GROUPS AND USERS
 		 */
-		groupsAndUsers = new Group("Root");
+		system = new Group("Root");
 		JTree treeGroupsUsers = new JTree();
-		treeGroupsUsers.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(groupsAndUsers.getId())));
+		treeGroupsUsers.setModel(new DefaultTreeModel(
+				new DefaultMutableTreeNode(system.getId())));
 		
-		// FORMATTING
+		// FORMATS TREE
 		treeGroupsUsers.setCellRenderer(new DefaultTreeCellRenderer() {
 
 			@Override
@@ -88,44 +96,56 @@ public class AdminControlPanel extends JFrame {
 		JButton btnAddUser = new JButton("Add User");
 		btnAddUser.setFont(new Font("Calibri", Font.PLAIN, 16));
 		
-		// When button is clicked, adds user.
-		// TODO - storing the data as actual User type
+		/*
+		 * When button is clicked, adds user.
+		 */
 		btnAddUser.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
+				
 				String userID = txtUserId.getText();
 				
-				// Gets group that was selected to add user into
+				// if nothing on tree has been selected
 				if (treeGroupsUsers.getSelectionPath() == null) {
-					JOptionPane.showMessageDialog(null, "Please select a group to add the user to.");
+					JOptionPane.showMessageDialog(null, "Please select a group to add the "
+							+ "user to.");
 				}
 				else {
+					// Gets group that was selected to add user into
 					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)
 							treeGroupsUsers.getSelectionPath().getLastPathComponent();
 					
 	
+					// If a user was selected instead of a group
 					if (!selectedNode.getAllowsChildren()) {
-						JOptionPane.showMessageDialog(null, "Cannot add a user to a user! Please select a group.");
+						JOptionPane.showMessageDialog(null, "Cannot add a user to a user! "
+								+ "Please select a group.");
 					}
-					else if (groupsAndUsers.isExistingID(userID)) {
+					else if (system.isExistingID(userID)) {
 							JOptionPane.showMessageDialog(null, "ID ALREADY EXISTS!");	
 					}
 					else {
 						User newUser = new User(userID);
-						Group parentNode = groupsAndUsers.findGroup(selectedNode.toString());
-						if (parentNode == null) {
-							JOptionPane.showMessageDialog(null, "PARENT NODE NOT FOUND");
+						Group group = system.findGroup(selectedNode.toString());
+						
+						if (group == null) {
+							JOptionPane.showMessageDialog(null, "GROUP NOT FOUND");
 						}
 						else {
-							parentNode.addChild(newUser);
+							group.addGroupOrUser(newUser);
 							
-							// Creates the user and adds under selected group. allowsChildren = false
-							DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(userID, false);
+							/*
+							 *  Creates the user and adds under selected group. 
+							 *  allowsChildren = false
+							 */
+							DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
+									userID, false);
 							selectedNode.add(newNode);
 							
 							// Reloads tree display to show updated version with new user
 							((DefaultTreeModel)treeGroupsUsers.getModel()).reload();
-							expandAllNodes(treeGroupsUsers, 0, treeGroupsUsers.getRowCount());
+							expandAllNodes(treeGroupsUsers, 0, 
+									treeGroupsUsers.getRowCount());
 						}
 					}
 				}
@@ -148,46 +168,51 @@ public class AdminControlPanel extends JFrame {
 		JButton btnAddGroup = new JButton("Add Group");
 		btnAddGroup.setFont(new Font("Calibri", Font.PLAIN, 16));
 		
-		// When button is clicked, adds group
-		// TODO - storing the data as actual Group type
+		/*
+		 *  When button is clicked, adds group
+		 */
 		btnAddGroup.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String groupID = txtGroupId.getText();
 				
-
+				// If nothing from tree was selected
 				if (treeGroupsUsers.getSelectionPath() == null) {
-					JOptionPane.showMessageDialog(null, "Please select a group to add the group to.");
+					JOptionPane.showMessageDialog(null, "Please select a group to add the "
+							+ "group to.");
 				}
 				else {
 					// Gets group that was selected to add user into
 					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)
 							treeGroupsUsers.getSelectionPath().getLastPathComponent();
 					
+					// If a group was not selected.
 					if (!selectedNode.getAllowsChildren()) {
-						JOptionPane.showMessageDialog(null, "Cannot add a group to a user! Please select a group.");
+						JOptionPane.showMessageDialog(null, "Cannot add a group to a user! "
+								+ "Please select a group.");
 					}
-
-					else if(groupsAndUsers.isExistingID(groupID)){
+					else if(system.isExistingID(groupID)){
 						    JOptionPane.showMessageDialog(null, "ID ALREADY EXISTS!");
 					}
 					else {
 						Group newGroup = new Group(groupID);
-						Group parentNode = groupsAndUsers.findGroup(selectedNode.toString());
+						Group group = system.findGroup(selectedNode.toString());
 						
-						if (parentNode == null) {
+						if (group == null) {
 							JOptionPane.showMessageDialog(null, "PARENT NODE NOT FOUND");
 						}
 						else {
-							parentNode.addChild(newGroup);
+							group.addGroupOrUser(newGroup);
 							
 							// Creates the group and adds group under selected group
-							DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(groupID);
+							DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(
+									groupID);
 							selectedNode.add(newNode);
 							
 							// Reloads tree display to show updated version with new user
 							((DefaultTreeModel)treeGroupsUsers.getModel()).reload();
-							expandAllNodes(treeGroupsUsers, 0, treeGroupsUsers.getRowCount());
+							expandAllNodes(treeGroupsUsers, 0, 
+									treeGroupsUsers.getRowCount());
 						}
 					}
 				}
@@ -195,25 +220,29 @@ public class AdminControlPanel extends JFrame {
 		});
 		
 		
-		
+
 		JButton btnOpenUserView = new JButton("Open User View");
 		btnOpenUserView.setFont(new Font("Calibri", Font.PLAIN, 16));
+		
+		// OPENS USER VIEW WINDOW WHEN CLICKED
 		btnOpenUserView.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+				DefaultMutableTreeNode id = (DefaultMutableTreeNode)
 						treeGroupsUsers.getLastSelectedPathComponent();
 				
-				if ( node != null && !node.getAllowsChildren()) {
-					String userId = node.toString();
-					User user = groupsAndUsers.findUser(userId);
+				// If item from tree was selected and it is not a group
+				if ( id != null && !id.getAllowsChildren()) {
+					String userId = id.toString();
+					User user = system.findUser(userId);
 					
-					UserView temp = new UserView(user, groupsAndUsers);
+					// Opens window
+					UserView temp = new UserView(user, system);
 					temp.setTitle(userId);
 					temp.setVisible(true);
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "Please select a USER to view.");
+					JOptionPane.showMessageDialog(null, "Please select a user to view.");
 				}
 			}
 		});
@@ -221,18 +250,21 @@ public class AdminControlPanel extends JFrame {
 		
 		
 		
-		
+		// TextPane to display results from buttons below
 		JTextPane textPane = new JTextPane();
 		textPane.setEditable(false);
 		
 		JButton btnUserTotal = new JButton("Show User Total");
 		btnUserTotal.setFont(new Font("Calibri", Font.PLAIN, 16)); 
 		
+		/*
+		 * VISITOR : shows total users in system
+		 */
 		btnUserTotal.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				CountUserSysEntryVisitor countUser = new CountUserSysEntryVisitor();
-				int userTotal = (int)(groupsAndUsers.accept(countUser));
+				int userTotal = (int)(system.accept(countUser));
 				String message = String.valueOf(userTotal) + " TOTAL USERS";
 				textPane.setText(message);
 			}
@@ -243,11 +275,14 @@ public class AdminControlPanel extends JFrame {
 		
 		
 		JButton btnShowGroupTotal = new JButton("Show Group Total");
+		/*
+		 * VISITOR : shows total groups in system
+		 */
 		btnShowGroupTotal.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {	
 				CountGroupSysEntryVisitor groupCalc = new CountGroupSysEntryVisitor();
-				int groupTotal = (int)(groupsAndUsers.accept(groupCalc));
+				int groupTotal = (int)(system.accept(groupCalc));
 				String message = String.valueOf(groupTotal) + " TOTAL GROUPS";
 				textPane.setText(message);
 			}
@@ -258,11 +293,14 @@ public class AdminControlPanel extends JFrame {
 		
 		
 		JButton btnShowMessageTotal = new JButton("Show Message Total");
+		/*
+		 * VISITOR : shows total messages in system
+		 */
 		btnShowMessageTotal.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {	
 				CountMsgSysEntryVisitor msgTotal = new CountMsgSysEntryVisitor();
-				int messageTotal = (int)(groupsAndUsers.accept(msgTotal));
+				int messageTotal = (int)(system.accept(msgTotal));
 				String message = String.valueOf(messageTotal) + " TOTAL MESSAGES";
 				textPane.setText(message);
 			}
@@ -272,20 +310,24 @@ public class AdminControlPanel extends JFrame {
 		
 		
 		JButton btnShowPositivePercentage = new JButton("Show Positive Percentage");
+		btnShowPositivePercentage.setFont(new Font("Calibri", Font.PLAIN, 16));
+		
+		/*
+		 * VISITOR : shows percentage of positive messages in system
+		 */
 		btnShowPositivePercentage.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {	
 				
 				String message;
-				CountMsgSysEntryVisitor totalMsg = new CountMsgSysEntryVisitor();
-				double total = groupsAndUsers.accept(totalMsg);
+				CountMsgSysEntryVisitor calcTotal = new CountMsgSysEntryVisitor();
+				double totalMsgs = system.accept(calcTotal);
 				
-				if(total != 0) {
+				if(totalMsgs != 0) {
 					PositiveSysEntryVisitor positiveCalc = new PositiveSysEntryVisitor();
-					double positive = groupsAndUsers.accept(positiveCalc);
-					
-					double positivePerc = (100 * (positive / total));
-		
+					double positive = system.accept(positiveCalc);
+					double positivePerc = (100 * (positive / totalMsgs));
+	
 					message = String.format("%.2f", positivePerc) + "% POSITIVE";
 				}
 				else {
@@ -295,8 +337,8 @@ public class AdminControlPanel extends JFrame {
 				textPane.setText(message);
 			}
 		});
-		btnShowPositivePercentage.setFont(new Font("Calibri", Font.PLAIN, 16));
-	
+		
+
 		
 		
 		/*
@@ -306,62 +348,75 @@ public class AdminControlPanel extends JFrame {
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(treeGroupsUsers, GroupLayout.PREFERRED_SIZE, 312, GroupLayout.PREFERRED_SIZE)
+					.addComponent(treeGroupsUsers, GroupLayout.PREFERRED_SIZE, 217, 
+							GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(textPane, GroupLayout.DEFAULT_SIZE, 259, 
+								Short.MAX_VALUE)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(txtGroupId, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE)
-								.addComponent(txtUserId, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnOpenUserView, GroupLayout.PREFERRED_SIZE, 149, GroupLayout.PREFERRED_SIZE))
+							.addGroup(gl_contentPane.createParallelGroup(
+									Alignment.TRAILING, false)
+								.addComponent(txtGroupId, Alignment.LEADING, 149, 149, 
+										Short.MAX_VALUE)
+								.addComponent(btnOpenUserView, Alignment.LEADING,
+										GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, 
+										Short.MAX_VALUE)
+								.addComponent(txtUserId))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(btnAddGroup, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(btnAddUser, GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE))
-							.addGap(10))
-						.addComponent(textPane, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-								.addComponent(btnUserTotal, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
-								.addComponent(btnShowMessageTotal, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(btnShowPositivePercentage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(btnShowGroupTotal, GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.RELATED, 10, Short.MAX_VALUE)))
-					.addContainerGap())
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, 
+									false)
+								.addComponent(btnAddUser, GroupLayout.DEFAULT_SIZE, 
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(btnAddGroup, GroupLayout.DEFAULT_SIZE, 
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+						.addComponent(btnShowMessageTotal, GroupLayout.DEFAULT_SIZE, 259, 
+								Short.MAX_VALUE)
+						.addComponent(btnShowGroupTotal, GroupLayout.DEFAULT_SIZE, 259, 
+								Short.MAX_VALUE)
+						.addComponent(btnShowPositivePercentage, GroupLayout.DEFAULT_SIZE, 
+								259, Short.MAX_VALUE)
+						.addComponent(btnUserTotal, GroupLayout.DEFAULT_SIZE, 259, 
+								Short.MAX_VALUE))
+					.addGap(152))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addComponent(treeGroupsUsers, GroupLayout.PREFERRED_SIZE, 514, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(treeGroupsUsers, GroupLayout.DEFAULT_SIZE, 
+								GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(txtUserId, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
+							.addGroup(gl_contentPane.createParallelGroup(
+									Alignment.BASELINE)
+								.addComponent(txtUserId, GroupLayout.PREFERRED_SIZE, 35, 
+										GroupLayout.PREFERRED_SIZE)
 								.addComponent(btnAddUser))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(txtGroupId, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnAddGroup))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnOpenUserView)
-							.addGap(18)
-							.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 148, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnUserTotal)
-								.addComponent(btnShowGroupTotal))
 							.addGap(1)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnShowPositivePercentage)
-								.addComponent(btnShowMessageTotal))))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addGroup(gl_contentPane.createParallelGroup(
+									Alignment.BASELINE)
+								.addComponent(txtGroupId, GroupLayout.PREFERRED_SIZE, 35, 
+										GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnAddGroup))
+							.addGap(1)
+							.addComponent(btnOpenUserView)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 54, 
+									GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnUserTotal)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnShowMessageTotal)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnShowGroupTotal)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnShowPositivePercentage)))
+					.addContainerGap(37, Short.MAX_VALUE))
 		);
 		contentPane.setLayout(gl_contentPane);
 	}
 	
-	
+	// SINGLETON : to access the single instance of this class. static for pattern.
 	public static AdminControlPanel getFrame() {
 		if(frame == null) {
 			synchronized(AdminControlPanel.class) {
@@ -374,7 +429,7 @@ public class AdminControlPanel extends JFrame {
 	}
 	
 	
-	// method
+	// Expands all groups in the tree
 	private void expandAllNodes(JTree tree, int startingIndex, int rowCount){
 		for(int i = startingIndex; i < rowCount; ++i){
 			tree.expandRow(i);

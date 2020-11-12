@@ -1,3 +1,10 @@
+/****************************************************************************************
+ * Name  : Milan Bui
+ * Date  : 12 November 2020
+ * Class : CS3650.01
+ * 
+ * Assignment 2
+ ****************************************************************************************/
 package cpp.cs3560.assignment2;
 
 import java.util.List;
@@ -5,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PositiveSysEntryVisitor implements SysEntryVisitor{
-	
+	// Instance Variable
 	private ArrayList<String> positiveWords;
 	
 	public PositiveSysEntryVisitor() {
@@ -17,15 +24,19 @@ public class PositiveSysEntryVisitor implements SysEntryVisitor{
 				"heartwarming", "incredible", "inspiring", "joy", "kind", "like", "love",
 				"marvelous", "motivating", "motivational", "nice", "optomistic", "pretty",
 				"perfection", "paradise", "remarkable", "stunning", "sweet", "positivity",
-				"thankful", "thriving", "thrive", "touched", "uplifting", "wonderful" });
+				"thankful", "thriving", "thrive", "touched", "uplifting", "wonderful",
+				"yay"});
 		
 		positiveWords = new ArrayList<String>(words);
 		
 	}
 
+	// Calculates total number of positive messages >> messages containing any of the
+	// words in positiveWords
 	@Override
 	public double visit(Group group) {
 		double count = 0;
+		
 		for(SystemEntry element : group.getGroupsAndUsers()) {
 			if ( element instanceof User) {
 				count = count + visit((User)element);
@@ -41,6 +52,7 @@ public class PositiveSysEntryVisitor implements SysEntryVisitor{
 	@Override
 	public double visit(User user) {
 		double count = 0;
+		
 		for (String message : user.getMessages()) {
 			for(String word : positiveWords) {
 				if (message.contains(word)) {

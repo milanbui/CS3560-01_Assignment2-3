@@ -1,7 +1,14 @@
+/****************************************************************************************
+ * Name  : Milan Bui
+ * Date  : 12 November 2020
+ * Class : CS3650.01
+ * 
+ * Assignment 2
+ ****************************************************************************************/
 package cpp.cs3560.assignment2;
 
 public class CountUserSysEntryVisitor implements SysEntryVisitor {
-
+	// Calc total # of users
 	@Override
 	public double visit(Group group) {
 		double count = 0;
@@ -10,8 +17,7 @@ public class CountUserSysEntryVisitor implements SysEntryVisitor {
 			if(element instanceof Group) {
 				count = count + visit((Group)element);
 			}
-			else {
-				
+			else {		
 				count =  count + visit((User)element);
 			}
 		}

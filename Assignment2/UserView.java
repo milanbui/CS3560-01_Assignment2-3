@@ -1,28 +1,20 @@
+/****************************************************************************************
+ * Name  : Milan Bui
+ * Date  : 12 November 2020
+ * Class : CS3650.01
+ * 
+ * Assignment 2
+ ****************************************************************************************/
 package cpp.cs3560.assignment2;
 
 import java.awt.*;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-
+import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.border.EmptyBorder;
-import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
-import javax.swing.JTextArea;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.JScrollBar;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EmptyBorder;
+
+
 
 public class UserView extends JDialog {
 
@@ -34,11 +26,13 @@ public class UserView extends JDialog {
 	 * Constructor: Create the User Window.
 	 */
 	public UserView(User user, Group system) {
+		// Creates Panel which holds all the ui elements
 		contentPanel = new JPanel();
-		setBounds(100, 100, 565, 601);
+		setBounds(100, 100, 394, 326);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.NORTH);
+		
 		
 		JLabel lblCurrentlyFollowing = new JLabel("Currently Following:");
 		lblCurrentlyFollowing.setFont(new Font("Calibri", Font.BOLD, 15));
@@ -61,7 +55,9 @@ public class UserView extends JDialog {
 		JButton btnFollowUser = new JButton("Follow User");
 		
 		
-		//Follows user with user id when button is clicked
+		/*
+		 * Follows user with user id when button is clicked and updates list model
+		 */
 		btnFollowUser.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -74,10 +70,12 @@ public class UserView extends JDialog {
 					User userToFollow = system.findUser(id);
 
 					if(userToFollow == null) {
-						JOptionPane.showMessageDialog(null, "USER \"" + id + "\" DOES NOT EXIST");
+						JOptionPane.showMessageDialog(null, "\"" + id 
+								+ "\" DOES NOT EXIST");
 					}
 					else if (user.getCurrentlyFollowing().contains(userToFollow)){
-						JOptionPane.showMessageDialog(null, "You are already following " + id);
+						JOptionPane.showMessageDialog(null, "You are already following " 
+								+ id);
 					}
 					else {
 						user.follow(userToFollow);
@@ -93,87 +91,106 @@ public class UserView extends JDialog {
 		JScrollPane newsFeedScrollPane = new JScrollPane();
 
 		/*
-		 * List of messages posted by who user is following
+		 * List of messages posted by who user is following including those they posted
+		 * themselves
 		 */
 		JList listNewsFeed = new JList();
 		newsFeedScrollPane.setViewportView(listNewsFeed);
 		listNewsFeed.setFont(new Font("Calibri", Font.PLAIN, 15));
-		DefaultListModel newsFeedModel = new DefaultListModel();
-		listNewsFeed.setModel(newsFeedModel);
+		listNewsFeed.setModel(user.getFeedModel());
 		
 
 
 		/*
-		 * Message user wants to tweet
+		 * Message user wants to post
 		 */
 		JTextArea txtrEnterTweet = new JTextArea();
 		txtrEnterTweet.setFont(new Font("Calibri", Font.PLAIN, 16));
 		txtrEnterTweet.setText("Share your thoughts...");
 		
-		// Posts tweet when user clicks button
-		JButton btnPostTweet = new JButton("Post Tweet");
+		/*
+		 *  OBSERVER PATTERN: Posts message when user clicks button and updates followers
+		 */
+		JButton btnPostTweet = new JButton("Post");
+		btnPostTweet.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 		btnPostTweet.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String message = txtrEnterTweet.getText();
 				user.postMessage(message);
-				newsFeedModel.insertElementAt(user.getId() + " : " +  message, 0);
-				listNewsFeed.setModel(newsFeedModel);
 			}
 		});
 		
 		
-		
+		/*
+		 * GUI LAYOUT
+		 */
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addGap(7)
 					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(txtrEnterTweet, GroupLayout.DEFAULT_SIZE, 350, 
+								Short.MAX_VALUE)
 						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addComponent(newsFeedScrollPane, GroupLayout.PREFERRED_SIZE, 521, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_contentPanel.createParallelGroup(
+									Alignment.LEADING)
+								.addComponent(txtUserId, 0, 0, Short.MAX_VALUE)
+								.addGroup(gl_contentPanel.createParallelGroup(
+										Alignment.LEADING, false)
+									.addComponent(listFollowing, Alignment.TRAILING, 
+											GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(lblCurrentlyFollowing, 
+											Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_contentPanel.createParallelGroup(
+									Alignment.LEADING)
 								.addComponent(lblNewsFeed)
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addComponent(txtrEnterTweet, GroupLayout.PREFERRED_SIZE, 399, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnPostTweet))
-								.addGroup(gl_contentPanel.createSequentialGroup()
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblCurrentlyFollowing)
-										.addComponent(listFollowing, GroupLayout.PREFERRED_SIZE, 321, GroupLayout.PREFERRED_SIZE))
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(btnFollowUser, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-										.addComponent(txtUserId, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))))
-							.addGap(35))))
+								.addGroup(gl_contentPanel.createParallelGroup(
+										Alignment.TRAILING, false)
+									.addGroup(Alignment.LEADING, 
+											gl_contentPanel.createSequentialGroup()
+										.addComponent(btnFollowUser)
+										.addPreferredGap(ComponentPlacement.RELATED, 
+												GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(btnPostTweet))
+									.addComponent(newsFeedScrollPane, Alignment.LEADING,
+											GroupLayout.PREFERRED_SIZE, 215, 
+											GroupLayout.PREFERRED_SIZE)))))
+					.addContainerGap())
 		);
 		gl_contentPanel.setVerticalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
-					.addComponent(lblCurrentlyFollowing)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblCurrentlyFollowing)
+						.addComponent(lblNewsFeed))
 					.addGap(1)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
-							.addComponent(txtUserId, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(4)
-							.addComponent(btnFollowUser))
-						.addComponent(listFollowing, GroupLayout.PREFERRED_SIZE, 167, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(listFollowing, GroupLayout.PREFERRED_SIZE, 131,
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(newsFeedScrollPane, GroupLayout.PREFERRED_SIZE, 131, 
+								GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(txtrEnterTweet, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(txtUserId, GroupLayout.PREFERRED_SIZE, 26, 
+								GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnFollowUser, GroupLayout.PREFERRED_SIZE, 26, 
+								GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnPostTweet))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblNewsFeed)
 					.addGap(1)
-					.addComponent(newsFeedScrollPane, GroupLayout.PREFERRED_SIZE, 186, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addComponent(txtrEnterTweet, GroupLayout.PREFERRED_SIZE, 65,
+							GroupLayout.PREFERRED_SIZE)
+					.addGap(73))
 		);
 		contentPanel.setLayout(gl_contentPanel);
 	}
 	
+	// Converts list of who user is following into a DefaultListModel
 	private DefaultListModel setFollowListModel(User user) {
 		DefaultListModel model = new DefaultListModel();
 		
