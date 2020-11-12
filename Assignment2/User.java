@@ -32,7 +32,7 @@ public class User extends Subject implements SystemEntry, Observer {
 
 	public void follow(User user) {
 		this.currentlyFollowing.add(user);
-		attach(user);
+		user.attach(this);
 	}
 	
 	public void postMessage(String message) {
@@ -47,10 +47,9 @@ public class User extends Subject implements SystemEntry, Observer {
 
 	@Override
 	public void update(Subject updatedUser) {
-		// TODO Auto-generated method stub
-		// update textarea
 		int index = ((User)updatedUser).getMessages().size() - 1;
-		((User)updatedUser).getMessages().get(index);
+		
+		System.out.println(((User)updatedUser).getId() + " : " + ((User)updatedUser).getMessages().get(index));
 		
 	}
 }

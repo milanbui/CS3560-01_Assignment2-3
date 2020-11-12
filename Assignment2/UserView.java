@@ -1,10 +1,10 @@
 package cpp.cs3560.assignment2;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
-import javax.swing.JButton;
+import javax.swing.*;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JScrollBar;
